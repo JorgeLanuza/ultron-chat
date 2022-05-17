@@ -1,0 +1,50 @@
+extends layout
+
+block content
+  .chat 
+    header 
+      h1 Terra chat
+      h4 
+        | Ussers connected:
+        span#numUssers
+    main 
+      ul#messages 
+        li Vicentin says: Mesagge 1
+        li Manolo Lama says: Mesagge 2
+        li Pepe Viyuela says: Mesagge 3
+        li Rosendo says : Mesagge 4  
+    footer 
+      div 
+        label Name 
+        input#inputName(type='text')
+      div  
+        label Message
+        input#inputMessage(type='text')
+      div  
+        button#sendBtn Send
+
+
+  script.
+    const socket = io();    
+    const inputName = document.getElementById('inputName')
+    const inputMessage = document.getElementById('inputMessage')
+    const btnSend = document.getElementById('sendBtn')
+    const messages = document.getElementById('messages')
+    const numUser = document.getElementById('user')
+
+    sendBtn.addEventListener('click', () => {
+      socket.emit('chat_message', {
+        name: inputName.value,
+        message: inputMessage.value
+      })
+    })
+    socket.on('chat_message', (data) => {
+      const li = document.createElement('li')
+      li.innerText = `${data.name}: ${data.message}`
+      messages.appendChild(li)
+    })
+    socket.on('chat_user', (data) => {
+      console.log(data)
+      numUser.innerText = data
+  
+    })
