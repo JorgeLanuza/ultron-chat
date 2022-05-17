@@ -8,8 +8,15 @@ var app = require('../app');
 var debug = require('debug')('05-websocket:server');
 var http = require('http');
 const { Socket } = require('socket.io');
+const { Message } = require('../models/message');
+
+// Configuro fichero de entorno
 
 require('dotenv').config();
+
+// Config de la base de datos
+
+require('../config/db');
 
 /**
  * Get port from environment and store in Express.
@@ -35,8 +42,22 @@ io.on('connection', (socket) => {
     }
   ]);
   io.emit('chat_usser', io.engine.clientsCount)
-  socket.on('chat_message', (data) => {
+  socket.on('chat_message', async (data) => {
+    await Message.create({
+      name: data.name,
+      text: data.message
+    })
     io.emit('chat_message', data);
+  })
+  socket.on('disconnect', () => {
+    io.emit('chat_usser', io.engine.clientsCount)
+    console.log('Client disconnected');
+    socket.broadcast.emit('chat_message',
+      {
+        name: 'Server',
+        message: 'Client disconnected'
+      }
+    );
   })
 })
 
