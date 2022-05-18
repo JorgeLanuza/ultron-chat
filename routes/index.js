@@ -1,4 +1,5 @@
 var express = require('express');
+const res = require('express/lib/response');
 var router = express.Router();
 
 var message = require('../models/message.model');
@@ -13,5 +14,15 @@ router.get('/', function (req, res, next) {
   });
   res.render('index');
 });
+
+router.get('/chat', async function (req, res, nexr) {
+  const message = await Message.find().sort({ createdAt: -1 }).limit(10).exec();
+})
+res.render('index');
+
+router.post('/login', (req, res) => {
+  req.session.name = req.body.name
+  req.redirect('/chat')
+})
 
 module.exports = router;
